@@ -11,3 +11,10 @@
 ```
 #### When you do the "git push origin HEAD:refs/heads/master", it will call the ref-update hook
 #### Change old ref-update script with '--uploader-username" and "args.uploader_username"
+
+
+# Notes of ref-updateed hook for Gerrit 2.15.1
+#### If you have setup msmtp on server, you can use the following code to send email with subject and body, need "\r\n\r\n" to setup subject and body
+```
+echo -e "Subject: $SUBJECT \r\n\r\n $BODY" | msmtp -d $EMAIL_LIST >> $LOG
+```
