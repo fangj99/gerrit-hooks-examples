@@ -1,0 +1,59 @@
+#!/bin/bash
+
+#ref-updated --oldrev <old rev> --newrev <new rev> --refname <ref name> --project <project name> --submitter <submitter>
+OLD_REV="$2"
+NEW_REV="$4"
+REF_NAME="$6"
+PROJECT_NAME="$8"
+SUBMITTER="${10}"
+
+LOG="/tmp/log.txt"
+date >> $LOG
+echo "args: $@" >> $LOG
+echo "old rev $OLD_REV" >> $LOG
+echo "new rev $NEW_REV" >> $LOG
+echo "ref name $REF_NAME" >> $LOG
+echo "project name $PROJECT_NAME" >> $LOG
+echo "submitter $SUBMITTER" >> $LOG
+
+NAME="$SUBMITTER"
+BRANCH="$REF_NAME"
+
+NUM_COMMITS=$(git log $OLD_REV..$NEW_REV --oneline|wc -l)
+
+SUBJECT="$NAME pushed $NUM_COMMITS commit(s) to $BRANCH on project $PROJECT_NAME"
+BODY="Insert summary of commits"
+
+TEAM1_EMAILS="stacy@example.org"
+TEAM2_EMAILS="t@example.org alice@example.org"
+ADMIN_EMAILS="bob@example.org"
+case $PROJECT_NAME in
+    project1*)
+        EMAIL_LIST="$TEAM1_EMAILS"
+        ;;
+    project2*)
+        EMAIL_LIST="$TEAM2_EMAILS"
+        ;;
+    *)
+        EMAIL_LIST="$ADMIN_EMAILS"
+        ;;
+esac
+
+echo "Subject is $SUBJECT" >> $LOG
+
+#for commit in $(git rev-list $OLD_REV..$NEW_REV); do
+#    echo "on commit sha1 $commit" >>$LOG
+#done
+
+# Example gitblit URL:
+# http://gitblit.rams/commit/hello-world.git/87926995aa1c64225520f0620972df92f6df6879
+BODY=$(git shortlog $OLD_REV..$NEW_REV --format="%s - http://gitblit.rams/commit/$PROJECT_NAME.git/%h")
+echo "Body is $BODY" >> $LOG
+
+# Send the email!
+echo "$BODY" | mail -s "$SUBJECT" $EMAIL_LIST
+# If you have setup msmtp on server, you can use the following code to send email
+# echo -e "Subject: $SUBJECT \r\n\r\n $BODY" | msmtp -d $EMAIL_LIST >> $LOG
+
+
+echo >> $LOG
