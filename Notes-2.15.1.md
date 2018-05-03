@@ -10,3 +10,4 @@
 
 ```
 #### When you do the "git push origin HEAD:refs/heads/master", it will call the ref-update hook
+#### Change old ref-update script with '--uploader-username" and "args.uploader_username"
